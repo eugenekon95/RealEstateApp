@@ -1,0 +1,21 @@
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+</head>
+<body>
+<h1>Hi, <%= @recievers %>!</h1>
+
+<p>You have new inquiry.</p>
+<p>Listing: <%= @listing.address %> </p>
+
+
+<ul style="list-style: none;">
+  <li><strong>User name: </strong><span><%= @inquiry.name %></span></li>
+  <li><strong>User email: </strong><span><%= @inquiry.email %></span></li>
+  <li><strong>Message: </strong>
+    <p><%= @inquiry.message %></p></li>
+</ul>
+
+
+</body>
+</html>

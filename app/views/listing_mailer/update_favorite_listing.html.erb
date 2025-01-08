@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Hi, <%= @user.email %></h1>
+
+    <p>One of your favorite listings was updated.</p>
+    <p><%= @listing.property_type %></p>
+    <p><%= @listing.address %></p>
+    <p>Price: <%= @listing.price %></p>
+    <p>Status:<%= @listing.status %></p>
+
+    <p><%= link_to 'Unsubscribe', @unsubscribe_url %></p>
+  </body>
+</html>

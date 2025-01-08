@@ -1,0 +1,11 @@
+<section class="bg-light pt-5 pb-5 shadow-sm">
+  <div class="container">
+    <h1><%= @agent.email %></h1>
+    <div class="row">
+      <%= render partial: "agent_listings/listing", collection: @listings %>
+    </div>
+  </div>
+  <%= paginate @listings, theme: 'twitter-bootstrap-4',
+               pagination_class: "pagination-sm",
+               nav_class: "d-inline-b" %>
+</section>

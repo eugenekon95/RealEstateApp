@@ -1,0 +1,54 @@
+<h3>Listings</h3>
+<p style="color: red"><%= alert %></p>
+<p style="color: green"><%= notice %></p>
+<div class="container">
+  <%= form_with url: listings_path, method: :get, local: true do |f| %>
+    <div class="row g-6">
+      <div class="col-2">
+        <%= f.number_field :min_price, min: 0,
+                           class: "form-control",
+                           placeholder: "min price", id: "inlineFormCustomSelect" %>
+      </div>
+      <div class="col-2">
+        <%= f.number_field :max_price, min: 0,
+                           class: "form-control",
+                           placeholder: "max price", id: "inlineFormCustomSelect" %>
+      </div>
+      <div class="col-2">
+        <%= f.number_field :min_bedrooms, min: 0,
+                           class: "form-control",
+                           placeholder: "bedrooms", id: "inlineFormCustomSelect" %>
+      </div>
+      <div class="col-2">
+        <%= f.select :order, options_for_select(['Newest', 'Recently updated', 'High Price First', 'Low Price First', 'Alphabetical'], params[:order]), {}, { class: "form-select" } %>
+      </div>
+
+      <div class="col-2">
+        <%= f.select :brokerage_id, brokerages_for_select, { include_blank: true }, { class: "form-select" } %>
+      </div>
+      <div class="col-2">
+        <%= f.text_field :city, placeholder: "city", class: "form-control" %>
+      </div>
+      <div class="col-2">
+        <%= f.submit "Submit", class: 'btn btn-danger', type: "submit" %>
+      </div>
+    </div>
+    <%= check_box_tag :closest_open_house, params[:closest_open_house], params[:closest_open_house].present?, class: 'form-check-input' %>
+    <span class="ms-2"> Open House</span>
+  <% end %>
+
+  <% if user_signed_in? %>
+    <% if @saved_search %>
+      <%= button_to 'Remove search from saved', saved_search_path(id: @saved_search.search_id), class: 'btn btn-warning', method: :delete %>
+    <% else %>
+      <%= button_to 'Save search', saved_searches_path(@search_params), method: :post, class: 'btn btn-primary' %>
+    <% end %>
+  <% end %>
+
+  <div class="row mt-5">
+    <%= render partial: "listing", collection: @listings %>
+    <%= paginate @listings, theme: 'twitter-bootstrap-4',
+                 pagination_class: "pagination-sm",
+                 nav_class: "d-inline-b" %>
+  </div>
+</div>

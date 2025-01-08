@@ -1,0 +1,5 @@
+<%= turbo_stream.append("favorite-listings-list", @favorite) %>
+<%= turbo_stream.replace(dom_id(@favorite), @favorite) %>
+<%= turbo_stream.update("no-favorites") do %>
+  &nbsp;
+<% end %>

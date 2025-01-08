@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Brokerages</h1>
+  </div>
+</div>
+<div class="container">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">City</th>
+        <th scope="col">Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= render partial: "admin/brokerages/brokerage", collection: @brokerages %>
+    </tbody>
+  </table>
+</div>

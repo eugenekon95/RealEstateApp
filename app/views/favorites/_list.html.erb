@@ -1,0 +1,11 @@
+<%= turbo_frame_tag("favorite-listings") do %>
+  <% if favorites.any? %>
+    <div id="favorite-listings-list">
+      <% favorites.each do |favorite| %>
+        <%= render(favorite) %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render 'favorites/empty_favorites' %>
+  <% end %>
+<% end %>

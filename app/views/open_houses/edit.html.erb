@@ -1,0 +1,7 @@
+<div class="container">
+  <h1 class="page-header p-3">Edit Open house</h1>
+  <div class="container">
+    <%= render "form", listing: @listing, open_house: @open_house %>
+    <%= button_to 'Delete', listing_open_house_path(@listing, @open_house), method: :delete, class: 'btn btn-warning mt-2' %>
+  </div>
+</div>

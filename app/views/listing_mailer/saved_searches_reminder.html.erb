@@ -1,0 +1,50 @@
+<p>Hi <%= @user.email %>,</p>
+
+<p> Here's your daily reminder about new/updated listings in Search № <%= @search.id %></p>
+<p> Search params</p>
+<table>
+  <thead>
+  <tr>
+    <th> City</th>
+    <th> Min price</th>
+    <th> Max price</th>
+    <th> Bedrooms</th>
+    <th> Brokerage</th>
+    <th> Open house</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>
+      <%= @search.city || '---' %>
+    </td>
+    <td>
+      <%= @search.min_price || '---' %>
+    </td>
+    <td>
+      <%= @search.max_price || '---' %>
+    </td>
+    <td>
+      <%= @search.min_bedrooms || '---' %>
+    </td>
+    <td>
+      <%= @brokerage_name || '---' %>
+    </td>
+    <td>
+      <%= @search.open_house || '---' %>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<% @listings.each do |listing| %>
+  <tr>
+    <td> <%= listing.city %> </td>
+    <td> <%= listing.price %> </td>
+    <td> <%= listing.status %> </td>
+    <td> <%= listing.bedrooms_quantity %> </td>
+    <td> <%= link_to "View this listing", listing %> </td>
+  </tr>
+  <p><%= link_to 'Manage subscriptions', @saved_searches_url %>
+    <br>
+<% end %>

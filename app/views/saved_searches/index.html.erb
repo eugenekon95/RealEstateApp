@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="row g-2 mt-3 ">
+    <div class="col-2">
+      <p class="p-3 border-bottom">Saved Items</p>
+      <%= link_to 'Saved Listings', favorites_path %>
+      <%= link_to 'Saved Searches', saved_searches_path, disabled: true, class: 'text-secondary text-decoration-none' %>
+    </div>
+    <div class="col-10">
+      <div class="row">
+        <% @saved_searches.each do |saved_search| %>
+          <div class="card mx-2" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title"> Search: <%= saved_search.search.id %></h5>
+              <% if saved_search.search.city %>
+                <h6 class="card-subtitle mb-2 text-muted"><%= saved_search.search.city %></h6>
+              <% end %>
+              <% if saved_search.search.min_bedrooms %>
+                <p class="card-text"><%= saved_search.search.min_bedrooms %> beds</p>
+              <% end %>
+              <% if saved_search.search.min_price || saved_search.search.max_price %>
+                <h6 class=" card-text text-success">
+                  <%= saved_search.search.min_price || 0 %> - <%= saved_search.search.max_price || '>' %>
+                </h6>
+              <% end %>
+              <% if saved_search.search.open_house %>
+                <span class="text-warning">With Open Houses</span>
+              <% end %>
+              <% if saved_search.search.brokerage_id %>
+                <h6 class="card-text text-primary "><%= @brokerages_names_by_id[saved_search.search.brokerage_id] %></h6>
+              <% end %>
+              <% if saved_search.search.order %>
+                <h6 class="card-text text-primary "><%= saved_search.search.order %> first</h6>
+              <% end %>
+              <% if saved_search.subscribed %>
+                <%= button_to 'Unsubscribe', saved_search_path(id: saved_search.id, subscribed: false), method: :patch %>
+              <% else %>
+                <%= button_to 'Subscribe', saved_search_path(id: saved_search.id, subscribed: true), method: :patch %>
+              <% end %>
+              <%= link_to "Results", listings_path(params: saved_search.search.attributes.slice('city', 'min_bedrooms', 'min_price', 'max_price', 'open_house', 'brokerage_id', 'order').symbolize_keys), class: 'card-link' %>
+              <%= link_to 'Remove from saved items', saved_search_path(saved_search), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" }, class: 'text-danger' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

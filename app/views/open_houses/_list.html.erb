@@ -1,0 +1,15 @@
+<div class="container">
+  <h4 class="p-2">Upcoming Open Houses:</h4>
+  <% if upcoming_open_houses.present? %>
+    <ul>
+      <% upcoming_open_houses.each do |open_house| %>
+        <li>
+          <%= open_house.date.strftime('%d.%m') %> -- <span><%= open_house.start_time&.strftime('%H:%M') %></span> - <span><%= open_house.end_time&.strftime('%H:%M') %></span>
+          <%= link_to 'Edit', edit_listing_open_house_path(listing, open_house) %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="alert alert-danger p-2">No upcoming Open Houses for this listing planned yet.</p>
+  <% end %>
+</div>

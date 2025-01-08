@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Users</h1>
+  </div>
+</div>
+<div class="container">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Email</th>
+        <th scope="col">Role</th>
+        <th scope="col">Edit Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= render partial: "admin/users/user", collection: @users %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,26 @@
+<div class="container" id="<%= dom_id(favorite) %>">
+  <div class="row">
+    <div class="col-lg-4 mb-3 d-flex align-items-stretch">
+      <div class="card">
+        <% if favorite.listing.pictures.attached? %>
+          <%= cl_image_tag(favorite.listing.pictures[0].key, width: 550, height: 300, crop: :fill, class: "card-img-top") %>
+        <% else %>
+          <%= image_tag('no-image.jpg', class: "card-img-top") %>
+        <% end %>
+        <span class="badge position-absolute top-0 start-50 translate-middle bg-info"><%= favorite.listing.status %></span>
+        <h5 class="card-title"><%= favorite.listing.property_type %></h5>
+        <p class="card-text mb-4 text-muted"><%= favorite.listing.city %></p>
+        <p class="card-text mb-4 text-muted"><%= favorite.listing.address %></p>
+        <p class="card-text mb-4 text-muted">Price:
+          <span class="text-success pt-2"><%= favorite.listing.price %></span>
+        </p>
+        <%= button_to(
+              "Remove Favorite",
+              favorite_path(id: favorite.listing.id),
+              method: "delete",
+              class: 'btn btn-danger', data: { turbo: false }
+            ) %>
+      </div>
+    </div>
+  </div>
+</div>

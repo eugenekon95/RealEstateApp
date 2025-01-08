@@ -1,0 +1,32 @@
+<div class="container">
+  <h1 class="p-3 page-header">Inquiries</h1>
+  <ul>
+    <% @grouped_inquiries.each do |listing, inquiries| %>
+      <li>
+        <p><%= link_to listing.address, listing_path(listing) %> (<%= listing.class.name.sub('Listing', '') %>)</p>
+
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col" style="width: 10%;">Date</th>
+            <th scope="col" style="width: 15%;">Name</th>
+            <th scope="col" style="width: 15%;">email</th>
+            <th scope="col" style="width: 60%;">Message</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <% inquiries.each do |inquiry| %>
+            <tr>
+              <td><%= inquiry.created_at.strftime('%b %e, %Y') %></td>
+              <td><%= inquiry.name %></td>
+              <td><%= inquiry.email %></td>
+              <td><%= inquiry.message %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </li>
+    <% end %>
+  </ul>
+</div>

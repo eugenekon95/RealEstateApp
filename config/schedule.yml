@@ -1,0 +1,4 @@
+saved_searches_reminder:
+  cron: "0 10 * * *"
+  class: "SearchNotificationJob"
+  queue: default

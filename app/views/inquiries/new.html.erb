@@ -1,0 +1,7 @@
+<div class="container">
+  <h1><%= @listing.address %></h1>
+  <h2>New Inquiry</h2>
+  <%= turbo_frame_tag "modal" do %>
+    <%= render "form", listing: @listing, inquiry: @inquiry %>
+  <% end %>
+</div>

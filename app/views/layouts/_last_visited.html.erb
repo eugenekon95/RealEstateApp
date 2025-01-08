@@ -1,0 +1,23 @@
+<% if last_visited.any? %>
+  <div class="fixed-bottom" style="right: 50px; bottom: 50px; left: auto;">
+    <button class="btn btn-sm btn-danger" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
+      Recently viewed listings
+    </button>
+  </div>
+  <div class="container collapse" id="collapseExample">
+    <h5 class="text-center" id="recently_viewed_listings"> Recently Viewed Listings </h5>
+    <div class="row mt-5">
+      <div class="col-10 mr-2 d-flex">
+        <% last_visited.each do |listing| %>
+          <div class="card m-3" style="width: 50rem;">
+            <div class="card-body">
+              <h5 class="card-title">
+                <%= listing[:property_type] %></h5>
+              <a class="link-secondary" href="<%= listing[:url] %>"> <%= listing[:address] %></a>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

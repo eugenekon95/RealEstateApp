@@ -1,0 +1,101 @@
+<p style="color: green"><%= notice %></p>
+<div class="container">
+  <div class="row g-1">
+    <div class="col-lg-12">
+      <% if @listing.pictures.attached? %>
+        <%= cl_image_tag(@listing.pictures[0].key, width: 550, height: 300, crop: :fill, class: "card-img-top") %>
+      <% else %>
+        <%= image_tag('no-image.jpg', class: "card-img-top") %>
+      <% end %>
+      <div data-controller="lightbox" class="images" data-lightbox-options-value='{"controls": true, "loop":true}'>
+        <% @listing.pictures.each do |picture| %>
+          <%= cl_image_tag picture.key %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-3">
+      <div class="card mt-2">
+        <div class="card-body">
+          <span class="badge position-absolute top-0 start-50 translate-middle bg-info"><%= @listing.status %></span>
+          <h5 class="card-title"><%= @listing.property_type %></h5>
+          <p class="card-text mb-4 text-muted"><%= @listing.unit_type %></p>
+          <p class="card-text mb-4 text-muted">Price:
+            <span class="text-success pt-2"><%= @listing.price %></span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="card mt-2">
+        <div class="card-body">
+          <h5 class="card-title"><%= @listing.city %></h5>
+          <p class="card-text mb-4 text-muted"><%= @listing.address %></p>
+          <p class="card-text mb-4 text-muted">Bedrooms:
+            <span class="text-secondary pt-2"><%= @listing.bedrooms_quantity %></span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="card mt-2">
+        <div class="card-body">
+          <h5 class="card-title">OpenHouses</h5>
+          <% if @upcoming_open_houses.any? %>
+            <ul>
+              <% @upcoming_open_houses.each do |open_house| %>
+                <li>
+                  <%= open_house.date.strftime('%d.%m') %> --
+                  <span><%= open_house.start_time&.strftime('%H:%M') %></span> -
+                  <span><%= open_house.end_time&.strftime('%H:%M') %></span>
+                  <% if access_granted(@listing) %>
+                    <%= link_to 'Edit', edit_listing_open_house_path(@listing, open_house) %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="alert alert-danger p-2">No upcoming Open Houses for this listing planned yet.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="card mt-2">
+        <div class="card-body">
+          <h5 class="card-title">Agents:</h5>
+          <% if @listing.users.any? %>
+            <ul>
+              <% @listing.users.each do |user| %>
+                <li>
+                  <span><%= user.email %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="alert alert-danger p-2">No upcoming Open Houses for this listing planned yet.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <% if user_signed_in? && @listing.favorites.detect { |favorite| favorite.user_id == current_user.id } %>
+        <%= form_with(url: favorite_path(@listing), method: :delete, data: { "turbo-frame": "favorite-listings" }) do |form| %>
+          <%= form.button("Remove Favorite", class: "btn btn-danger") %>
+        <% end %>
+      <% elsif user_signed_in? %>
+        <%= form_with(url: favorites_path(listing_id: @listing), method: :post, data: { "turbo-frame": "favorite-listings" }) do |form| %>
+          <%= form.button("Make Favorite", class: "btn btn-success") %>
+        <% end %>
+      <% end %>
+      <br>
+      <% if access_granted(@listing) %>
+        <%= link_to "Edit listing", edit_listing_path(@listing) %>
+        <%= link_to 'Add Open House', new_listing_open_house_path(@listing) %>
+      <% end %>
+      <%= link_to 'Contact Agent', new_listing_inquiry_path(@listing), data: { turbo_frame: 'modal' } %>
+      <%= link_to "Back to listings", listings_path %>
+    </div>
+  </div>
+</div>

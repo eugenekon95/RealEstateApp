@@ -1,0 +1,31 @@
+<%= form_with model: [listing, open_house] do |form| %>
+  <% open_house.errors.full_messages_for(:open_house).each do |message| %>
+    <div class="text-danger"><%= message %></div>
+  <% end %>
+  <div class="col-3">
+    <%= form.label :date, class: 'form-control-label p-2' %><br>
+    <% open_house.errors.full_messages_for(:date).each do |message| %>
+      <div class="text-danger"><%= message %></div>
+    <% end %>
+    <%= form.date_field :date, class: 'form-control' %>
+  </div>
+  <div class="row m-2">
+    <div class="col-2 row">
+      <%= form.label :start_time, class: 'form-control-label p-2' %><br>
+      <%= form.time_select :start_time, { ignore_date: true, minute_step: 5 }, class: 'form-control col', style: 'max-width: 50px;' %>
+    </div>
+    <div class="col-2 row">
+      <%= form.label :end_time, class: 'form-control-label p-2' %><br>
+      <%= form.time_select :end_time, { ignore_date: true, minute_step: 5 }, class: 'form-control col', style: 'max-width: 50px;' %>
+    </div>
+    <% open_house.errors.full_messages_for(:start_time).each do |message| %>
+      <div class="text-danger"><%= message %></div>
+    <% end %>
+    <% open_house.errors.full_messages_for(:end_time).each do |message| %>
+      <div class="text-danger"><%= message %></div>
+    <% end %>
+  </div>
+  <div>
+    <%= form.submit nil, class: 'btn btn-danger' %>
+  </div>
+<% end %>

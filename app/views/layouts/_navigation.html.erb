@@ -1,0 +1,59 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <%= link_to "Estatery", root_path, class: "navbar-brand" %>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <%= form_with url: '/listings', class: "d-flex", method: :get, local: true do |f| %>
+      <%= f.text_field :query, class: "form-control me-2", placeholder: "Search" %>
+      <%= f.submit "Search", class: 'btn btn-danger my-2 my-sm-0', type: "submit" %>
+    <% end %>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <% if user_signed_in? %>
+          <li class="nav-item">
+            <%= link_to "Dashboard", admin_users_path, class: "nav-link text-dark" if current_user.admin? %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Favorites", favorites_path, class: "nav-link text-dark" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "My subscriptions", edit_mailer_subscription_path(current_user.id), class: "nav-link text-dark" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "My searches", saved_searches_path, class: "nav-link text-dark" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Users", admin_users_path, class: "nav-link text-dark" if current_user.admin? %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Brokerages", admin_brokerages_path, class: "nav-link text-dark" if current_user.admin? %>
+          </li>
+          <li class="nav-item mr-2">
+            <%= link_to "Create Listing", new_listing_path, class: "nav-link text-success" if current_user.agent? %>
+          </li>
+
+          <li class="nav-item mr-2">
+            <%= link_to "Inquiries", inquiries_path, class: "nav-link text-dark" if current_user.agent? %>
+          </li>
+          <li class="nav-item mr-2">
+            <%= link_to "My Listings", agent_listings_path(current_user.id), class: "nav-link text-primary" if current_user.agent? %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Favorites", favorites_path, class: "nav-link text-dark" %>
+          </li>
+          <li class="nav-item">
+            <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "btn btn-danger" %>
+          </li>
+        <% else %>
+          <li class="nav-item">
+            <%= link_to "Register", new_user_registration_path, class: "nav-link text-dark" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Login", new_user_session_path, class: "nav-link text-dark" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>

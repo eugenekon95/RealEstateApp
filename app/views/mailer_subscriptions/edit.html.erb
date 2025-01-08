@@ -1,0 +1,13 @@
+<div class="container">
+  <h2 class='p-3 header'>Manage subscriptions</h2>
+
+  <% if @message %>
+    <p class="p-3 text-danger"><%= @message %></p>
+  <% else %>
+    <ul class="p-3">
+      <li><p>Sending Emails on Favorites Updates</p>
+        <%= button_to 'Unsubscribe', mailer_subscription_path, method: :patch, params: { mailer: params[:mailer], subscribed: false }, class: 'btn btn-md btn-outline-danger' %>
+      </li>
+    </ul>
+  <% end %>
+</div>
