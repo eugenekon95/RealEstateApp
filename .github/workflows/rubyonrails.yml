@@ -38,6 +38,7 @@ jobs:
       POSTGRES_HOST_AUTH_METHOD: trust
       REDIS_URL: redis://localhost:6379
       REDIS_PROVIDER: REDIS_URL
+      ELASTICSEARCH_URL: http://localhost:9200
     services:
       postgres:
         image: postgres:12.11-alpine
@@ -56,6 +57,18 @@ jobs:
         image: redis:latest
         ports:
           - 6379:6379
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd="curl http://localhost:9200/_cluster/health"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby
