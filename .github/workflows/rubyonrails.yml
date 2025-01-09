@@ -1,0 +1,80 @@
+name: Rails CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.0
+          bundler-cache: true
+      - name: Cache apt packages
+        uses: actions/cache@v3
+        with:
+          path: apt-cache
+          key: ${{ runner.os }}-apt-cache
+      - run: |
+          mkdir -p apt-cache
+          sudo apt-get update -qq
+          sudo apt-get -o dir::cache::archives="apt-cache" install -yqq cmake libpq-dev g++ npm curl
+      - name: Install dependencies
+        run: |
+          gem install bundler -v 2.3.17
+          bundle install --jobs 4 --path vendor/bundle
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      POSTGRES_HOST_AUTH_METHOD: trust
+      REDIS_URL: redis://localhost:6379
+      REDIS_PROVIDER: REDIS_URL
+      ELASTICSEARCH_URL: http://localhost:9200
+    services:
+      postgres:
+        image: postgres:12.11-alpine
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.7
+        options: >-
+          --health-cmd="curl -f http://localhost:9200/_cat/health"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.0
+      - name: Copy database configuration
+        run: cp config/database-github.yml config/database.yml
+      - name: Prepare database
+        run: bundle exec rails db:create db:schema:load --trace
+      - name: Precompile assets
+        run: bundle exec rails assets:precompile
+      - name: Run RSpec tests
+        run: bundle exec rspec --profile 5
