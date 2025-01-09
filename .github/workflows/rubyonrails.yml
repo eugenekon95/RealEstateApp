@@ -32,7 +32,7 @@ jobs:
       - name: Check Ruby and Rails versions
         run: |
           ruby -v
-          bundle exec rails -v
+          bundle exec rails -v  # Check if rails is available
 
   test:
     needs: setup
