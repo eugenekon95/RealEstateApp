@@ -29,6 +29,10 @@ jobs:
         run: |
           gem install bundler -v 2.3.17
           bundle install --jobs 4 --path vendor/bundle
+      - name: Check Ruby and Rails versions
+        run: |
+          ruby -v
+          bundle exec rails -v
 
   test:
     needs: setup
