@@ -3,7 +3,7 @@ test:
   encoding: unicode
   pool: 5
   timeout: 5000
-  host: postgres
+  host: localhost
   database: real_estate_app_test
   username: postgres
   password: password
