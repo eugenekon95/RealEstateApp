@@ -6,9 +6,9 @@ class ListingsController < ApplicationController
     redirect_to listings_path, notice: 'Not allowed to perform this action' unless current_user&.agent?
   end
   before_action :redirect_user, unless: :authorize_access, only: %i[edit update destroy]
-  before_action :agents, only: %i[new create edit]
   before_action :upcoming_open_houses, only: :show
   helper_method :access_granted
+  helper_method :form_url, :form_method
 
 
 
@@ -26,30 +26,42 @@ class ListingsController < ApplicationController
   end
 
   def new
-    @listing = Listing.new
+    @form = ListingForm.new(current_user: current_user)
   end
 
-  def edit; end
-
   def create
-    @listing = Listing.new(listing_params.merge(user_ids: validated_agents))
 
-    if @listing.save
+
+    @form = ListingForm.new(listing_form_params, current_user: current_user)
+
+    if @form.save
       redirect_to listings_path, notice: 'Listing was successfully created.'
     else
+
       render :new, status: :unprocessable_entity
     end
   end
 
+  def edit
+    @form = ListingForm.new(
+      listing_attributes_for_form(@listing),
+      listing: @listing,
+      current_user:current_user)
+  end
+
   def update
+    @form = ListingForm.new(
+      listing_form_params,
+      listing: @listing,
+      current_user: current_user
+    )
+
     respond_to do |format|
-      if @listing.update(listing_params.merge(user_ids: validated_agents))
+      if @form.update
         UpdateFavoriteNotificationsJob.perform_later(@listing) if @listing.favorites.any?
         format.html { redirect_to listing_url(@listing), notice: 'Listing was successfully updated.' }
-        format.json { render :show, status: :ok, location: @listing }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @listing.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -68,6 +80,14 @@ class ListingsController < ApplicationController
     current_user&.brokerage_id == listing.users.first.brokerage_id
   end
 
+  def form_url
+    @listing&.persisted? ? listing_path(@listing) : listings_path
+  end
+
+  def form_method
+    @listing&.persisted? ? :patch : :post
+  end
+
   def set_listing
     @listing = Listing.find(params[:id])
   end
@@ -80,14 +100,6 @@ class ListingsController < ApplicationController
     access_granted(@listing)
   end
 
-  def agents
-    @agents ||= User.where(brokerage_id: current_user.brokerage_id)
-  end
-
-  def validated_agents
-    listing_params[:user_ids].compact_blank.map(&:to_i) & agents.map(&:id)
-  end
-
   def upcoming_open_houses
     @upcoming_open_houses = @listing.open_houses.upcoming.to_a
   end
@@ -96,8 +108,28 @@ class ListingsController < ApplicationController
     params.permit(:min_price, :max_price, :city, :min_bedrooms, :brokerage_id, :order, :open_house)
   end
 
-  def listing_params
-    params.require(:listing).permit(:property_type, :unit_type, :description, :address, :city, :bedrooms_quantity,
-                                    :price, :status, user_ids: [], pictures: [])
+
+  def listing_attributes_for_form(listing)
+    listing.slice(
+      :property_type,
+      :unit_type,
+      :description,
+      :address,
+      :city,
+      :bedrooms_quantity,
+      :price,
+      :status
+    ).merge(
+      user_ids: listing.user_ids,
+      pictures: listing.pictures.attachments
+    )
+  end
+
+  def listing_form_params
+    params.require(:listing_form).permit(
+      :property_type, :unit_type, :description, :address, :city,
+      :bedrooms_quantity, :price, :status,
+      user_ids: [], pictures: []
+    )
   end
 end
