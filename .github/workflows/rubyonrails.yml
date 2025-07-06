@@ -71,6 +71,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.2.0
+          bundler-cache: true
       - name: Copy database configuration
         run: cp config/database-github.yml config/database.yml
       - name: Prepare database
