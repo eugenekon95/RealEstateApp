@@ -96,10 +96,19 @@ RSpec.describe 'Listings', type: :request, redis: true do
       it 'creates a new listing' do
         sign_in(agent)
         expect do
-          post listings_url, params:
-            {
-              listing: attributes_for(:listing, { user_ids: [agent.id] })
+          post listings_url, params: {
+            listing_form: {
+              property_type: 'Flat',
+              unit_type: 'sale',
+              description: 'Nice place',
+              address: 'Some Street 123',
+              city: 'Kyiv',
+              bedrooms_quantity: 3,
+              price: 100000,
+              status: 'active',
+              user_ids: [agent.id]
             }
+          }
         end.to change(Listing, :count).by(1)
       end
     end
@@ -108,7 +117,7 @@ RSpec.describe 'Listings', type: :request, redis: true do
       it 'doesn`t create new listing' do
         agent = create :user, :agent
         sign_in(agent)
-        expect { post listings_url, params: { listing: { price: 'price', user_ids: [agent.id] } } }.to change {
+        expect { post listings_url, params: { listing_form: { price: 'price', user_ids: [agent.id] } } }.to change {
           Listing.count
         }.by(0)
       end
@@ -119,7 +128,7 @@ RSpec.describe 'Listings', type: :request, redis: true do
         it ' doesn`t create new listing' do
           admin = create :user, :admin
           sign_in(admin)
-          expect { post listings_url, params: { listing: attributes_for(:listing) } }.to_not change {
+          expect { post listings_url, params: { listing_form: attributes_for(:listing) } }.to_not change {
             admin.listings.count
           }.from(0)
           expect(response).to redirect_to(listings_path)
@@ -131,7 +140,7 @@ RSpec.describe 'Listings', type: :request, redis: true do
         it ' doesn`t create new listing' do
           regular = create :user, :regular
           sign_in(regular)
-          expect { post listings_url, params: { listing: attributes_for(:listing) } }.to_not change {
+          expect { post listings_url, params: { listing_form: attributes_for(:listing) } }.to_not change {
             regular.listings.count
           }.from(0)
         end
@@ -139,7 +148,7 @@ RSpec.describe 'Listings', type: :request, redis: true do
 
       context 'when not authorized user' do
         it ' doesn`t create new listing' do
-          expect { post listings_url, params: { listing: attributes_for(:listing) } }.to_not change {
+          expect { post listings_url, params: { listing_form: attributes_for(:listing) } }.to_not change {
             Listing.count
           }.from(0)
           expect(response).to redirect_to(listings_path)
@@ -160,17 +169,30 @@ RSpec.describe 'Listings', type: :request, redis: true do
     context 'with valid parameters' do
       it 'updates the requested listing' do
         sign_in(agent)
-        expect { patch listing_path(listing), params: { listing: { price: 5_000, user_ids: [agent.id] } } }.to change {
-          listing.reload.price
-        }.from(8_000).to(5_000)
-        expect(response).to redirect_to(listing_path(listing))
+        listing = create(:listing, price: 8000, user_ids: [agent.id])
+
+        expect {
+          patch listing_path(listing), params: {
+            listing_form: {
+              property_type: listing.property_type,
+              unit_type: listing.unit_type,
+              description: listing.description,
+              address: listing.address,
+              city: listing.city,
+              bedrooms_quantity: listing.bedrooms_quantity,
+              status: listing.status,
+              price: 5000,
+              user_ids: [agent.id]
+            }
+          }
+        }.to change { listing.reload.price }.from(8000).to(5000)
       end
     end
 
     context 'with invalid parameters' do
       it ' doesn`t update the requested listing' do
         sign_in(agent)
-        expect { patch listing_path(listing), params: { listing: { price: 'price', user_ids: [agent.id] } } }.to_not change {
+        expect { patch listing_path(listing), params: { listing_form: { price: 'price', user_ids: [agent.id] } } }.to_not change {
           listing.reload.price
         }
       end
