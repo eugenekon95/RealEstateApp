@@ -38,8 +38,11 @@ RSpec.describe UpdateFavoriteNotificationsJob, type: :job do
   end
 
   describe '.perform_later' do
+    let(:listing) { create(:listing) }
     it 'adds the job to the queue :default' do
-      expect { UpdateFavoriteNotificationsJob.perform_later }.to have_enqueued_job.on_queue(:default).exactly(:once)
+      expect {
+        UpdateFavoriteNotificationsJob.perform_later(listing)
+      }.to have_enqueued_job(UpdateFavoriteNotificationsJob).with(satisfy { |arg| arg.id == listing.id }).exactly(:once)
     end
   end
 end

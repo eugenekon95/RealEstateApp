@@ -40,7 +40,7 @@ class Listing < ApplicationRecord
       created_at: created_at,
       updated_at: updated_at,
       open_houses_expirations: open_houses.map do |open_house|
-        if open_house.date >= Date.today.asctime.in_time_zone(Time.now.zone)
+        if open_house.date >= Time.zone.today
           (open_house.date.strftime('%m-%d-%Y') +
             " " +
             open_house.end_time.strftime('%H:%M'))
