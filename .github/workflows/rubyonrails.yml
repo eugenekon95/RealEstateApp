@@ -34,7 +34,7 @@ jobs:
         run: |
           ruby -v
           bundle exec rails -v
-          bundle exec rails runner 'puts Logger'
+          bundle exec rails runner 'require "logger"; puts Logger'
           
 
   test:
