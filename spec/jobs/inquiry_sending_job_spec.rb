@@ -13,7 +13,7 @@ RSpec.describe InquirySendingJob, type: :job do
 
     describe '.perform_later' do
       it 'adds the job to the queue :default' do
-        expect { InquirySendingJob.perform_later }.to have_enqueued_job.on_queue(:default).exactly(:once)
+        expect { InquirySendingJob.perform_later(listing,inquiry) }.to have_enqueued_job.on_queue(:default).with(listing, inquiry).exactly(:once)
       end
     end
   end
