@@ -27,7 +27,7 @@ gem 'stimulus-rails'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'bootstrap', '~> 5.1.3'
 gem 'devise'
-gem 'faker', git: 'https://github.com/faker-ruby/faker.git', branch: 'master'
+gem 'faker', git: 'https://github.com/faker-ruby/faker.git', branch: 'main'
 gem 'htmlbeautifier'
 gem 'cloudinary'
 gem 'active_storage_validations'
