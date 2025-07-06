@@ -1,75 +1,89 @@
 <div class="container">
-  <%= form_with(model: listing) do |form| %>
-    <% if listing.errors.any? %>
+  <%= form_with(model: form, url: form_url, method: form_method) do |f| %>
+
+    <% if form.errors.any? %>
       <div id="error_explanation">
-        <h2><%= pluralize(listing.errors.count, "error") %> prohibited this listing from being saved:</h2>
+        <h2><%= pluralize(form.errors.count, "error") %> prohibited this listing from being saved:</h2>
         <ul>
-          <% listing.errors.each do |error| %>
-            <li><%= error.full_message %></li>
+          <% form.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
           <% end %>
         </ul>
       </div>
     <% end %>
+
     <div class="row g-3">
       <div class="col-4">
-        <b><%= form.label :property_type %></b>
-        <%= form.text_field :property_type, class: 'form-control' %>
+        <b><%= f.label :property_type %></b>
+        <%= f.text_field :property_type, class: 'form-control' %>
       </div>
       <div class="col-4">
-        <b><%= form.label :city %></b>
-        <%= form.text_field :city, class: 'form-control' %>
+        <b><%= f.label :city %></b>
+        <%= f.text_field :city, class: 'form-control' %>
       </div>
       <div class="col-4">
-        <b><%= form.label :address %></b>
-        <%= form.text_field :address, class: 'form-control' %>
+        <b><%= f.label :address %></b>
+        <%= f.text_field :address, class: 'form-control' %>
       </div>
     </div>
+
     <div class="row g-2">
       <div class="col-6">
-        <%= form.label :unit_type %>
-        <%= form.select :unit_type, Listing.unit_types.keys, {}, { class: "form-select" } %>
+        <%= f.label :unit_type %>
+        <%= f.select :unit_type, Listing.unit_types.keys, {}, { class: "form-select" } %>
       </div>
       <div class="col-6">
-        <%= form.label :status %>
-        <%= form.select :status, Listing.statuses.keys, {}, { class: "form-select" } %>
+        <%= f.label :status %>
+        <%= f.select :status, Listing.statuses.keys, {}, { class: "form-select" } %>
       </div>
     </div>
+
     <div class="row g-2">
       <div class="col-6">
-        <b><%= form.label :bedrooms_quantity %></b>
-        <%= form.text_field :bedrooms_quantity, class: 'form-control' %>
+        <b><%= f.label :bedrooms_quantity %></b>
+        <%= f.text_field :bedrooms_quantity, class: 'form-control' %>
       </div>
       <div class="col-6">
-        <b><%= form.label :price %></b>
-        <%= form.text_field :price, class: 'form-control' %>
+        <b><%= f.label :price %></b>
+        <%= f.text_field :price, class: 'form-control' %>
       </div>
     </div>
+
     <div class="form-group">
-      <b><%= form.label :description %></b>
-      <%= form.text_area :description, class: 'form-control', rows: "3" %>
+      <b><%= f.label :description %></b>
+      <%= f.text_area :description, class: 'form-control', rows: "3" %>
     </div>
+
     <div class="field">
-      <%= form.label :agents %>
-      <%= form.collection_check_boxes(:user_ids, agents, :id, :email) %>
+      <%= f.label :agents %>
+      <%= f.collection_check_boxes(:user_ids, form.agents, :id, :email) %>
     </div>
 
     <div data-controller="multi-upload">
       <div class="pictures">
-        <%= form.label :pictures %>
-        <%= form.file_field :pictures, multiple: true, accept: 'image/jpeg', class: 'form-control' %>
+        <%= f.label :pictures %>
+        <%= f.file_field :pictures, multiple: true, accept: 'image/jpeg', class: 'form-control' %>
       </div>
-      <div class="mb-2 row">
-        <% listing.pictures.each do |picture| %>
-          <div class="col-2">
-            <div class="row"><%= cl_image_tag(picture.key, width: 120, height: 80, crop: :fill, class: 'w-auto') %></div>
-            <div class="row"><%= link_to "Delete picture", listing_picture_path(listing, picture), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" } %>
+
+      <% if listing&.pictures&.attached? %>
+        <div class="mb-2 row">
+          <% listing.pictures.each do |picture| %>
+            <div class="col-2">
+              <div class="row">
+                <%= cl_image_tag(picture.key, width: 120, height: 80, crop: :fill, class: 'w-auto') %>
+              </div>
+              <div class="row">
+                <%= link_to "Delete picture", listing_picture_path(listing, picture),
+                            data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" } %>
+              </div>
             </div>
-          </div>
-        <% end %>
-      </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
+
     <div class="actions">
-      <%= form.submit nil, class: "btn btn-success mt-2" %>
+      <%= f.submit nil, class: "btn btn-success mt-2" %>
     </div>
   <% end %>
 </div>

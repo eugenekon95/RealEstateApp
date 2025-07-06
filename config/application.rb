@@ -12,7 +12,7 @@ Bundler.require(*Rails.groups)
 module RealEstateApp
   class Application < Rails::Application
     config.load_defaults 7.0
-    config.active_storage.replace_on_assign_to_many = false
+    config.active_storage.replace_on_assign_to_many = true
     config.active_job.queue_adapter = :sidekiq
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
