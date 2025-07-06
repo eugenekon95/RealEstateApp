@@ -27,6 +27,7 @@ jobs:
           sudo apt-get -o dir::cache::archives="apt-cache" install -yqq cmake libpq-dev g++ npm curl
       - name: Install dependencies
         run: |
+          rm -rf vendor/bundle
           gem install bundler -v 2.4.1
           bundle install --jobs 4 --retry 3
       - name: Check Ruby and Rails versions
