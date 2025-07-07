@@ -27,14 +27,8 @@ jobs:
           sudo apt-get -o dir::cache::archives="apt-cache" install -yqq cmake libpq-dev g++ npm curl
       - name: Install dependencies
         run: |
-          gem install bundler -v 2.4.1
-          bundle install --jobs 4 --retry 3
-      - name: Check Ruby and Rails versions
-        run: |
-          ruby -v
-          bundle exec rails -v
-          bundle exec rails runner 'require "logger"; puts Logger'
-          
+          gem install bundler -v 2.3.17
+          bundle install --jobs 4 --path vendor/bundle
 
   test:
     needs: setup
@@ -45,7 +39,6 @@ jobs:
       REDIS_URL: redis://localhost:6379
       REDIS_PROVIDER: REDIS_URL
       ELASTICSEARCH_URL: http://localhost:9200
-      BUNDLE_PATH: vendor/bundle
     services:
       postgres:
         image: postgres:12.11-alpine
@@ -57,7 +50,7 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_DB: real_estate_app_test
+          POSTGRES_DB: test_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
       redis:
@@ -65,23 +58,18 @@ jobs:
         ports:
           - 6379:6379
       elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
-        ports:
-          - 9200:9200
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.7
         options: >-
-          --health-cmd="curl -s http://localhost:9200/_cluster/health || exit 1"
+          --health-cmd="curl -f http://localhost:9200/_cat/health"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-        env:
-          discovery.type: single-node
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.2.0
-          bundler-cache: true
       - name: Copy database configuration
         run: cp config/database-github.yml config/database.yml
       - name: Prepare database
