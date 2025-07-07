@@ -3,21 +3,27 @@
 require 'rails_helper'
 
 RSpec.describe SearchListingsService, search: true do
+  def filtered_params(params = {})
+    FilterParamsService.new(params).call
+  end
+
   context 'order' do
     it 'returns Newest first' do
       older = create(:listing, created_at: 5.days.ago)
       newer = create(:listing, created_at: 2.days.ago)
 
-      params = { order: 'Newest' }
+      params = filtered_params(order: 'Newest')
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
       expect(result.to_a).to eq([newer, older])
     end
+
     it 'returns Recently updated first' do
       recently_updated = create(:listing, updated_at: 5.days.ago)
       sale = create(:listing, updated_at: 2.month.ago)
-      params = { order: 'Recently updated' }
+
+      params = filtered_params(order: 'Recently updated')
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
@@ -28,7 +34,7 @@ RSpec.describe SearchListingsService, search: true do
       more_expensive = create(:listing, price: 3_000)
       less_expensive = create(:listing, price: 2_000)
 
-      params = { order: 'Low Price First' }
+      params = filtered_params(order: 'Low Price First')
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
@@ -39,7 +45,7 @@ RSpec.describe SearchListingsService, search: true do
       more_expensive = create(:listing, price: 3_000)
       less_expensive = create(:listing, price: 2_000)
 
-      params = { order: 'High Price First' }
+      params = filtered_params(order: 'High Price First')
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
@@ -47,10 +53,10 @@ RSpec.describe SearchListingsService, search: true do
     end
 
     it 'returns Newest first by default' do
-      older = create(:listing)
-      newer = create(:listing)
+      older = create(:listing, created_at: 5.days.ago)
+      newer = create(:listing, created_at: 2.days.ago)
 
-      params = {}
+      params = filtered_params # no `order` param
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
@@ -61,16 +67,17 @@ RSpec.describe SearchListingsService, search: true do
       house = create(:listing, property_type: 'House')
       flat = create(:listing, property_type: 'Flat')
 
-      params = { order: 'Alphabetical' }
+      params = filtered_params(order: 'Alphabetical')
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
+
       expect(result.to_a).to eq([flat, house])
     end
   end
 
   context 'without params' do
     it 'returns all the listings' do
-      params = {}
+      params = filtered_params
       create_list :listing, 5
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
@@ -84,15 +91,15 @@ RSpec.describe SearchListingsService, search: true do
     let!(:low_price_listing) { create :listing, price: 3_000 }
 
     it 'returns listings above or equal price' do
-      params = { min_price: 4_000 }
-      result = SearchListingsService.new(params).call
+      params = filtered_params(min_price: 4_000)
       Listing.search_index.refresh
+      result = SearchListingsService.new(params).call
 
       expect(result.to_a).to match_array([high_price_listing, mid_price_listing])
     end
 
     it 'returns listings below or equal price' do
-      params = { max_price: 4_000 }
+      params = filtered_params(max_price: 4_000)
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
@@ -100,7 +107,7 @@ RSpec.describe SearchListingsService, search: true do
     end
 
     it 'returns listings with exact Price' do
-      params = { min_price: 3_000, max_price: 3_000 }
+      params = filtered_params(min_price: 3_000, max_price: 3_000)
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
@@ -114,7 +121,7 @@ RSpec.describe SearchListingsService, search: true do
     let!(:four_beds) { create :listing, bedrooms_quantity: 4 }
 
     it 'returns 2 of 3 listings when bedrooms = 2' do
-      params = { min_bedrooms: 2 }
+      params = filtered_params(min_bedrooms: 2)
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
@@ -122,7 +129,8 @@ RSpec.describe SearchListingsService, search: true do
     end
 
     it 'returns no listing when bedrooms = 5' do
-      params = { min_bedrooms: 5 }
+      params = filtered_params(min_bedrooms: 5)
+      Listing.search_index.refresh
       result = SearchListingsService.new(params).call
 
       expect(result).to match_array []
@@ -138,7 +146,7 @@ RSpec.describe SearchListingsService, search: true do
     let!(:other_listing) { create :listing, users: [other_agent] }
 
     it 'returns listing that belong to certain brokerage' do
-      params = { brokerage_id: brokerage.id }
+      params = filtered_params(brokerage_id: brokerage.id)
       Listing.search_index.refresh
       result = SearchListingsService.new(params).call
       expect(result.to_a).to match_array [listing]
@@ -149,8 +157,9 @@ RSpec.describe SearchListingsService, search: true do
     let(:listing) { create :listing }
     let!(:open_house) { create :open_house, listing: listing }
     let!(:other_listing) { create :listing }
+
     it 'returns listing with upcoming open_house' do
-      params = { closest_open_house: 'on' }
+      params = filtered_params(closest_open_house: 'on')
       Listing.reindex
       result = SearchListingsService.new(params).call
 

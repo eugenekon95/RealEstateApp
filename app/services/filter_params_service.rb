@@ -30,6 +30,7 @@ class FilterParamsService
   private
 
   def order_type(type)
+
     ORDER_TYPES[type] || ORDER_TYPES['Newest']
   end
 end
