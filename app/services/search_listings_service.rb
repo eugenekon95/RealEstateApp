@@ -3,18 +3,17 @@
 class SearchListingsService
   PER_PAGE = 6
 
-  def initialize(params)
-    @params = params
+  def initialize(filtered_params)
+    @params = filtered_params
   end
 
   def call
-    params = FilterParamsService.new(@params).call
-    search_condition = params[:query] || '*'
+    search_condition = @params[:query] || '*'
     Listing.search(search_condition,
                    fields: [:city, :address], match: :word_start, misspellings: false,
-                   order: params[:order],
-                   where: get_search_params(params),
-                   page: params[:page], per_page: PER_PAGE,
+                   order: @params[:order],
+                   where: get_search_params(@params),
+                   page: @params[:page], per_page: PER_PAGE,
                    includes: [:closest_open_house, :favorites, { users: :brokerage }],
                    scope_results: ->(r) { r.with_attached_pictures })
   end

@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 class FilterParamsService
-
   ORDER_TYPES = {
-    'Recently updated' => { updated_at: { order: :desc, unmapped_type: 'long' } },
-    'Low Price First' => { price: { order: :asc, unmapped_type: 'long' } },
-    'High Price First' => { price: { order: :desc, unmapped_type: 'long' } },
-    'Newest' => { created_at: { order: :desc, unmapped_type: 'long' } },
-    'Alphabetical' => { property_type: { order: :asc, unmapped_type: 'long' } }
+    'Recently updated' => { updated_at: :desc },
+    'Low Price First' => { price: :asc },
+    'High Price First' => { price: :desc },
+    'Newest' => { created_at: :desc },
+    'Alphabetical' => { property_type: :asc }
   }.freeze
 
   def initialize(params = {})
