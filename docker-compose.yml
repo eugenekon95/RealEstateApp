@@ -18,6 +18,7 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - HISTFILE=/root/hist/.bash_history
       - RUBY_DEBUG_BB=1
+      - REDIS_URL=redis://redis:6379/1
     volumes:
       - .:/real-estate-app
       - real-estate-bash-history:/root/hist
@@ -44,7 +45,7 @@ services:
       service: redis
 
 volumes:
-  delivery-dbdata:
-  delivery-esdata:
+  real-estate-dbdata:
+  real-estate-esdata:
   real-estate-bash-history:
   real-estate-redisdata:

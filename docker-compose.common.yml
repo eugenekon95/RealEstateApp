@@ -10,7 +10,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - 'real-estate-app-dbdata:/var/lib/postgresql/data'
+      - 'real-estate-dbdata:/var/lib/postgresql/data'
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
@@ -34,6 +34,6 @@ services:
     restart: always
 
 volumes:
-  delivery-dbdata:
-  delivery-esdata:
-  delivery-redisdata:
+  real-estate-dbdata:
+  real-estate-esdata:
+  real-estate-redisdata:

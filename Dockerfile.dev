@@ -1,4 +1,4 @@
-ARG RUBY_VERSION=3.2.0
+ARG RUBY_VERSION=3.2.2
 FROM ruby:$RUBY_VERSION-slim as base
 
 WORKDIR /real-estate-app
@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
       build-essential \
       libpq-dev \
       libvips
+
+
+RUN gem install bundler --no-document
 
 COPY Gemfile Gemfile.lock ./
 
@@ -28,7 +31,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 # Copy built artifacts: gems, application
 COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /delivery-app /delivery-app/
+COPY --from=build /real-estate-app /real-estate-app/
 
 # Get NodeJS
 COPY --from=node:20-slim /usr/local/bin /usr/local/bin

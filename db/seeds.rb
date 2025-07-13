@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
+# Відключаємо Searchkick колбеки, щоб не намагатися індексувати записи без підключення до ES
+Searchkick.disable_callbacks
+
 Listing.destroy_all
 User.destroy_all
 Brokerage.destroy_all
 
 User.create(email: 'admin@estatery.com', password: '12345678', role: :admin)
+
 3.times do
   Brokerage.create!(
     name: Faker::Company.name,
@@ -12,6 +16,7 @@ User.create(email: 'admin@estatery.com', password: '12345678', role: :admin)
     city: Faker::Address.city
   )
 end
+
 10.times do
   User.create!(
     email: Faker::Internet.email,
@@ -50,4 +55,9 @@ end
     user_ids: [User.where(role: :agent).ids.sample]
   )
 end
+
 User.create(email: 'agent@estatery.com', password: '12345678', role: :agent, brokerage_id: Brokerage.all.ids.sample)
+
+# Вмикаємо колбеки Searchkick назад
+Searchkick.enable_callbacks
+Listing.reindex
