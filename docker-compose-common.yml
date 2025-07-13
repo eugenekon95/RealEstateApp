@@ -1,0 +1,39 @@
+services:
+  postgres:
+    restart: always
+    image: postgres:14-alpine
+    container_name: real-estate-db
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'real-estate-app-dbdata:/var/lib/postgresql/data'
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    container_name: real-estate-elasticsearch
+    ports:
+      - '9200:9200'
+    environment:
+      - 'discovery.type=single-node'
+      - 'xpack.security.enabled=false'
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    volumes:
+      - 'real-estate-esdata:/usr/share/elasticsearch/data:delegated'
+
+  redis:
+    image: redis:7-alpine
+    container_name: real-estate-app-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'real-estate-redisdata:/data'
+    restart: always
+
+volumes:
+  delivery-dbdata:
+  delivery-esdata:
+  delivery-redisdata:
