@@ -1,0 +1,49 @@
+stages:
+  - setup
+  - test
+
+variables:
+  RAILS_ENV: test
+  POSTGRES_HOST_AUTH_METHOD: trust
+  REDIS_URL: redis://localhost:6379
+  REDIS_PROVIDER: REDIS_URL
+  ELASTICSEARCH_URL: http://localhost:9200
+  BUNDLE_JOBS: 4
+  BUNDLE_PATH: vendor/bundle
+
+.default_ruby_job:
+  image: ruby:3.2.0
+  before_script:
+    - apt-get update -qq
+    - apt-get install -yqq cmake libpq-dev g++ npm curl
+    - gem install bundler -v 2.3.17
+    - bundle install
+
+setup:
+  stage: setup
+  extends: .default_ruby_job
+  script:
+    - echo "Setup complete (dependencies installed)"
+  artifacts:
+    paths:
+      - vendor/bundle
+
+test:
+  stage: test
+  extends: .default_ruby_job
+  services:
+    - name: postgres:12.11-alpine
+      alias: postgres
+    - name: redis:latest
+      alias: redis
+    - name: docker.elastic.co/elasticsearch/elasticsearch:7.17.7
+      alias: elasticsearch
+  variables:
+    POSTGRES_DB: test_db
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: password
+  script:
+    - cp config/database-gitlab.yml config/database.yml
+    - bundle exec rails db:create db:schema:load --trace
+    - bundle exec rails assets:precompile
+    - bundle exec rspec --profile 5
