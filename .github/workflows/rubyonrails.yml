@@ -59,11 +59,13 @@ jobs:
           ruby-version: 3.2.2
           bundler-cache: true
 
-      - name: Check Gemfile.lock is in sync
-        run: bundle lock --check
+      - name: Ensure all gems are installed and Gemfile.lock is in sync
+        run: |
+          bundle check || (echo '❌ Gemfile.lock is not in sync with Gemfile. Run bundle install.' && exit 1)
 
       - name: Install dependencies
         run: bundle install --jobs 4 --retry 3
+
 
       - name: Copy database configuration
         run: cp config/database-github.yml config/database.yml
