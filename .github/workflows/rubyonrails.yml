@@ -14,7 +14,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.2.0
+          ruby-version: 3.2.2
           bundler-cache: true
       - name: Cache apt packages
         uses: actions/cache@v3
@@ -27,7 +27,7 @@ jobs:
           sudo apt-get -o dir::cache::archives="apt-cache" install -yqq cmake libpq-dev g++ npm curl
       - name: Install dependencies
         run: |
-          gem install bundler -v 2.4.1
+          gem install bundler -v 2.6.9
           bundle install --jobs 4 --retry 3
       - name: Check Ruby and Rails versions
         run: |
@@ -80,7 +80,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.2.0
+          ruby-version: 3.2.2
           bundler-cache: true
       - name: Copy database configuration
         run: cp config/database-github.yml config/database.yml
