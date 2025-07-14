@@ -1,4 +1,4 @@
-name: Rails CI/CD
+name: Rails CI
 
 on:
   push:
@@ -7,37 +7,7 @@ on:
   pull_request:
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.2.0
-          bundler-cache: true
-      - name: Cache apt packages
-        uses: actions/cache@v3
-        with:
-          path: apt-cache
-          key: ${{ runner.os }}-apt-cache
-      - run: |
-          mkdir -p apt-cache
-          sudo apt-get update -qq
-          sudo apt-get -o dir::cache::archives="apt-cache" install -yqq cmake libpq-dev g++ npm curl
-      - name: Install dependencies
-        run: |
-          gem install bundler -v 2.4.1
-          bundle install --jobs 4 --retry 3
-      - name: Check Ruby and Rails versions
-        run: |
-          ruby -v
-          bundle exec rails -v
-          bundle exec rails runner 'require "logger"; puts Logger'
-          
-
   test:
-    needs: setup
     runs-on: ubuntu-latest
     env:
       RAILS_ENV: test
@@ -46,6 +16,7 @@ jobs:
       REDIS_PROVIDER: REDIS_URL
       ELASTICSEARCH_URL: http://localhost:9200
       BUNDLE_PATH: vendor/bundle
+
     services:
       postgres:
         image: postgres:12.11-alpine
@@ -60,10 +31,12 @@ jobs:
           POSTGRES_DB: real_estate_app_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
+
       redis:
         image: redis:latest
         ports:
           - 6379:6379
+
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
         ports:
@@ -75,18 +48,33 @@ jobs:
           --health-retries=5
         env:
           discovery.type: single-node
+          xpack.security.enabled: false
+
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.2.0
+          ruby-version: 3.2.2
           bundler-cache: true
+
+      - name: Ensure all gems are installed and Gemfile.lock is in sync
+        run: |
+          bundle check || (echo '❌ Gemfile.lock is not in sync with Gemfile. Run bundle install.' && exit 1)
+
+      - name: Install dependencies
+        run: bundle install --jobs 4 --retry 3
+
+
       - name: Copy database configuration
         run: cp config/database-github.yml config/database.yml
+
       - name: Prepare database
         run: bundle exec rails db:create db:schema:load --trace
+
       - name: Precompile assets
         run: bundle exec rails assets:precompile
+
       - name: Run RSpec tests
         run: bundle exec rspec --profile 5

@@ -1,0 +1,13 @@
+#!/bin/bash
+# run chmod +x ./bin/dockerless
+
+container_name=$(awk -F': *' '/^[[:space:]]*container_name:/ && /-app$/ {print $2; exit}' docker-compose.yml | tr -d '[:space:]')
+
+if docker compose ps | grep "$container_name" > /dev/null; then
+  echo "Stopping $container_name"
+  docker compose stop "$container_name"
+fi
+
+docker_ip=0.0.0.0
+eval $(cat ./.env | sed "s/\(\(.*_HOST\)\)=.*$/\1=${docker_ip}/" | sed 's/^\(.*\)$/export \1/')
+$@

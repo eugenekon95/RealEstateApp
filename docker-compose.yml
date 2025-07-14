@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.common.yml
+      service: postgres
+
+  real-estate-app:
+    container_name: real-estate-app
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - HISTFILE=/root/hist/.bash_history
+      - RUBY_DEBUG_BB=1
+      - REDIS_URL=redis://redis:6379/1
+    volumes:
+      - .:/real-estate-app
+      - real-estate-bash-history:/root/hist
+    depends_on:
+      - postgres
+      - elasticsearch
+      - redis
+    ports:
+      - "3000:3000"
+    command: ['./bin/docker-dev-server.sh']
+    privileged: true
+    stdin_open: true
+    tty: true
+    shm_size: 1024M
+
+  elasticsearch:
+    extends:
+      file: docker-compose.common.yml
+      service: elasticsearch
+
+  redis:
+    extends:
+      file: docker-compose.common.yml
+      service: redis
+
+volumes:
+  real-estate-dbdata:
+  real-estate-esdata:
+  real-estate-bash-history:
+  real-estate-redisdata:

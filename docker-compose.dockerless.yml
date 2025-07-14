@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.common.yml
+      service: postgres
+
+  elasticsearch:
+    extends:
+      file: docker-compose.common.yml
+      service: elasticsearch
+  redis:
+    extends:
+      file: docker-compose.common.yml
+      service: redis
+
+volumes:
+  real-estate-dbdata:
+  real-estate-esdata:
+  real-estate-bash-history:
+  real-estate-redisdata:
